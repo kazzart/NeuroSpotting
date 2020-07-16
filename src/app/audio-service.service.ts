@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { PreprocessorService } from './preprocessor.service';
 import * as Fili from 'fili';
 
 @Injectable({
@@ -9,11 +10,13 @@ export class AudioService {
   private listening: BehaviorSubject<Boolean>;
   private audioCtx: AudioContext;
   private microphone: MediaStreamAudioSourceNode;
+  private preprocessor: PreprocessorService;
   private worklet: AudioWorkletNode;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
     this.audioCtx = new AudioContext();
+    this.preprocessor = new PreprocessorService(2, 0.2, this.audioCtx);
     this._CreateRecorderWorklet(0.2);
     this.listening = new BehaviorSubject<Boolean>(false);
     return this.listening;
@@ -31,7 +34,10 @@ export class AudioService {
         this.worklet.port.onmessage = (event) => {
           if (event.data.eventType == 'audioData') {
             const audioData = event.data.audioPCM;
-            console.log(audioData);
+            this.preprocessor.appendData(audioData);
+            if (this.preprocessor.bufferIsReady()) {
+              console.log(this.preprocessor.process());
+            }
           }
         };
       })
@@ -42,6 +48,7 @@ export class AudioService {
 
   public Record(): void {
     let callback = function (stream) {
+      this.audioCtx.resume();
       this.microphone = this.audioCtx.createMediaStreamSource(stream);
       this.microphone.connect(this.worklet);
       this.worklet.connect(this.audioCtx.destination);
@@ -57,6 +64,7 @@ export class AudioService {
   public Stop(): void {
     this.microphone.disconnect(this.worklet);
     this.worklet.disconnect(this.audioCtx.destination);
+    this.audioCtx.suspend();
     this.listening.next(false);
   }
 }

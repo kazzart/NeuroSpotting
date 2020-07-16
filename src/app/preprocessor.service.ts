@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
 import * as Fili from 'fili';
+import { BufferPCMService } from './buffer-pcm.service';
 
-@Injectable({
-  providedIn: 'root',
-})
 export class PreprocessorService {
-  buffer: Buffer;
+  buffer: BufferPCMService;
   n_parts: number;
-  audioCtx: AudioContext;
   static firCalculator = new Fili.FirCoeffs();
   static firFilltersCoeffs = PreprocessorService.firCalculator.bandpass({
     order: 99,
@@ -17,21 +14,24 @@ export class PreprocessorService {
   });
   static firFilter = new Fili.FirFilter(PreprocessorService.firFilltersCoeffs);
 
-  constructor(bufferLen: number, part_len: number, audioCtx: AudioContext) {
-    this.buffer = new Buffer(this.audioCtx, bufferLen);
-    this.n_parts = bufferLen / part_len;
+  constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
+    this.buffer = new BufferPCMService(
+      bufferLen * audioCtx.sampleRate,
+      audioCtx
+    );
+    this.n_parts = bufferLen / partLen;
   }
 
   appendData(data: Float32Array) {
-    this.buffer.append(data);
+    this.buffer.Append(data);
   }
 
   clearBuffer() {
-    this.buffer.clear();
+    this.buffer.Clear();
   }
 
   bufferIsReady() {
-    return this.buffer.isReady();
+    return this.buffer.IsReady();
   }
 
   static formantFiltering(PCMdata: number[]) {
@@ -89,7 +89,7 @@ export class PreprocessorService {
       PreprocessorService.split(
         PreprocessorService.square(
           PreprocessorService.normalize(
-            PreprocessorService.formantFiltering(this.buffer.buffer)
+            PreprocessorService.formantFiltering(this.buffer.GetBuffer())
           )
         ),
         this.n_parts
