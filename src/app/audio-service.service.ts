@@ -11,7 +11,7 @@ export class AudioService {
   private audioCtx: AudioContext;
   private microphone: MediaStreamAudioSourceNode;
   private preprocessor: PreprocessorService;
-  private worklet: AudioWorkletNode;
+  private recorder: AudioWorkletNode;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
@@ -24,14 +24,14 @@ export class AudioService {
 
   private _CreateRecorderWorklet(windowLen: number) {
     this.audioCtx.audioWorklet
-      .addModule('../assets/audio-worklet.js')
+      .addModule('../assets/recorder-worklet.js')
       .then(() => {
-        this.worklet = new AudioWorkletNode(this.audioCtx, 'bypass-processor', {
+        this.recorder = new AudioWorkletNode(this.audioCtx, 'recorder', {
           processorOptions: {
             bufferLen: windowLen * this.audioCtx.sampleRate,
           },
         });
-        this.worklet.port.onmessage = (event) => {
+        this.recorder.port.onmessage = (event) => {
           if (event.data.eventType == 'audioData') {
             const audioData = event.data.audioPCM;
             this.preprocessor.appendData(audioData);
@@ -50,8 +50,8 @@ export class AudioService {
     let callback = function (stream) {
       this.audioCtx.resume();
       this.microphone = this.audioCtx.createMediaStreamSource(stream);
-      this.microphone.connect(this.worklet);
-      this.worklet.connect(this.audioCtx.destination);
+      this.microphone.connect(this.recorder);
+      this.recorder.connect(this.audioCtx.destination);
     }.bind(this);
     this.listening.next(true);
     navigator.getUserMedia(
@@ -62,8 +62,8 @@ export class AudioService {
   }
 
   public Stop(): void {
-    this.microphone.disconnect(this.worklet);
-    this.worklet.disconnect(this.audioCtx.destination);
+    this.microphone.disconnect(this.recorder);
+    this.recorder.disconnect(this.audioCtx.destination);
     this.audioCtx.suspend();
     this.listening.next(false);
   }
