@@ -1,25 +1,28 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PreprocessorService } from './preprocessor.service';
+import { NeuralNetworkService } from './neural-network.service';
 import * as Fili from 'fili';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
-  private listening: BehaviorSubject<Boolean>;
   private audioCtx: AudioContext;
   private microphone: MediaStreamAudioSourceNode;
   private preprocessor: PreprocessorService;
   private recorder: AudioWorkletNode;
+  private network: NeuralNetworkService;
+  private recording: Boolean;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
+    this.recording = false;
     this.audioCtx = new AudioContext();
-    this.preprocessor = new PreprocessorService(2, 0.2, this.audioCtx);
+    this.preprocessor = new PreprocessorService(2, 0.1, this.audioCtx);
+    this.network = new NeuralNetworkService();
     this._CreateRecorderWorklet(0.2);
-    this.listening = new BehaviorSubject<Boolean>(false);
-    return this.listening;
+    return this.network.prediction;
   }
 
   private _CreateRecorderWorklet(windowLen: number) {
@@ -36,7 +39,7 @@ export class AudioService {
             const audioData = event.data.audioPCM;
             this.preprocessor.appendData(audioData);
             if (this.preprocessor.bufferIsReady()) {
-              console.log(this.preprocessor.process());
+              this.network.Predict(this.preprocessor.process());
             }
           }
         };
@@ -47,24 +50,28 @@ export class AudioService {
   }
 
   public Record(): void {
-    let callback = function (stream) {
-      this.audioCtx.resume();
-      this.microphone = this.audioCtx.createMediaStreamSource(stream);
-      this.microphone.connect(this.recorder);
-      this.recorder.connect(this.audioCtx.destination);
-    }.bind(this);
-    this.listening.next(true);
-    navigator.getUserMedia(
-      { video: false, audio: true },
-      callback,
-      console.log
-    );
+    if (!this.recording) {
+      let callback = function (stream) {
+        this.recording = true;
+        this.audioCtx.resume();
+        this.microphone = this.audioCtx.createMediaStreamSource(stream);
+        this.microphone.connect(this.recorder);
+        this.recorder.connect(this.audioCtx.destination);
+      }.bind(this);
+      navigator.getUserMedia(
+        { video: false, audio: true },
+        callback,
+        console.log
+      );
+    }
   }
 
   public Stop(): void {
-    this.microphone.disconnect(this.recorder);
-    this.recorder.disconnect(this.audioCtx.destination);
-    this.audioCtx.suspend();
-    this.listening.next(false);
+    if (this.recording) {
+      this.recording = false;
+      this.microphone.disconnect(this.recorder);
+      this.recorder.disconnect(this.audioCtx.destination);
+      this.audioCtx.suspend();
+    }
   }
 }

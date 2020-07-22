@@ -6,12 +6,20 @@ import { AudioService } from '../audio-service.service';
   styleUrls: ['./test-component.component.css'],
 })
 export class TestComponentComponent implements OnInit {
-  listening: Boolean;
+  prediction: Boolean;
   constructor(private audio: AudioService) {}
 
   ngOnInit(): void {
-    this.listening = false;
-    this.audio.Init().subscribe((val: Boolean) => (this.listening = val));
+    this.prediction = false;
+    this.audio.Init().subscribe((val: Boolean) => {
+      if (this.prediction != val) {
+        console.log(val);
+      }
+      this.prediction = val;
+      if (this.prediction) {
+        this.audio.Stop();
+      }
+    });
   }
 
   Start(): void {
