@@ -7,20 +7,12 @@ export class NeuralNetworkService {
   public prediction: BehaviorSubject<Boolean>;
   constructor() {
     this.prediction = new BehaviorSubject<Boolean>(false);
-    this._ModelLoad()
-      .then((loadedModel) => {
-        this.model = loadedModel;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
-
-  private async _ModelLoad(): Promise<tf.LayersModel> {
-    const model = await tf.loadLayersModel(
-      'https://files.rtuitlab.ru/sergeev/model/model.json'
-    );
-    return model;
+    tf.loadLayersModel(
+      'https://files.rtuitlab.ru/sergeev/model/Jarvis/model.json'
+    ).then((loadedModel) => {
+      this.model = loadedModel;
+      console.log('loaded');
+    });
   }
 
   public Predict(data: Array<number>): void {
@@ -32,6 +24,7 @@ export class NeuralNetworkService {
     predicted.data().then((data) => {
       val = data[0] < data[1];
       this.prediction.next(val);
+      console.log('ОПа, ключевое слово');
     });
   }
 }

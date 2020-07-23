@@ -13,16 +13,20 @@ export class AudioService {
   private preprocessor: PreprocessorService;
   private recorder: AudioWorkletNode;
   private network: NeuralNetworkService;
-  private recording: Boolean;
+  private recording: BehaviorSubject<Boolean>;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
-    this.recording = false;
+    this.recording = new BehaviorSubject<Boolean>(false);
     this.audioCtx = new AudioContext();
-    this.preprocessor = new PreprocessorService(2, 0.1, this.audioCtx);
+    this.preprocessor = new PreprocessorService(0.4, 0.02, this.audioCtx);
     this.network = new NeuralNetworkService();
     this._CreateRecorderWorklet(0.2);
     return this.network.prediction;
+  }
+
+  public GetRecordingState(): BehaviorSubject<Boolean> {
+    return this.recording;
   }
 
   private _CreateRecorderWorklet(windowLen: number) {
@@ -43,21 +47,18 @@ export class AudioService {
             }
           }
         };
-      })
-      .catch((e) => {
-        console.log('Could not load because of: ' + e);
       });
   }
 
   public Record(): void {
-    if (!this.recording) {
+    if (!this.recording.value) {
       let callback = function (stream) {
-        this.recording = true;
         this.audioCtx.resume();
         this.microphone = this.audioCtx.createMediaStreamSource(stream);
         this.microphone.connect(this.recorder);
         this.recorder.connect(this.audioCtx.destination);
       }.bind(this);
+      this.recording.next(true);
       navigator.getUserMedia(
         { video: false, audio: true },
         callback,
@@ -67,10 +68,11 @@ export class AudioService {
   }
 
   public Stop(): void {
-    if (this.recording) {
-      this.recording = false;
+    if (this.recording.value) {
+      this.recording.next(false);
       this.microphone.disconnect(this.recorder);
       this.recorder.disconnect(this.audioCtx.destination);
+      this.preprocessor.clearBuffer();
       this.audioCtx.suspend();
     }
   }
