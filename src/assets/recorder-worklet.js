@@ -34,7 +34,7 @@ class RecorderWorklet extends AudioWorkletProcessor {
   }
 
   _Flush() {
-    let buffer = this._buffer;
+    let buffer = this._buffer.slice();
     this.port.postMessage({
       eventType: "audioData",
       audioPCM: buffer,

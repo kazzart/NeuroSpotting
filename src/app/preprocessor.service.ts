@@ -6,13 +6,8 @@ export class PreprocessorService {
   buffer: BufferPCMService;
   n_parts: number;
   static firCalculator = new Fili.FirCoeffs();
-  static firFilltersCoeffs = PreprocessorService.firCalculator.bandpass({
-    order: 99,
-    Fs: 48000,
-    F1: 260,
-    F2: 700,
-  });
-  static firFilter = new Fili.FirFilter(PreprocessorService.firFilltersCoeffs);
+  static firFilltersCoeffs;
+  static firFilter;
 
   constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
     this.buffer = new BufferPCMService(
@@ -20,6 +15,16 @@ export class PreprocessorService {
       audioCtx
     );
     this.n_parts = bufferLen / partLen;
+  }
+
+  static initFirFilter({order = 999, Fs, F1 = 260, F2 = 700}){
+    PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass({
+      order: order,
+      Fs: Fs,
+      F1: F1,
+      F2: F2,
+    });
+    PreprocessorService.firFilter = new Fili.FirFilter(PreprocessorService.firFilltersCoeffs);
   }
 
   appendData(data: Float32Array) {
