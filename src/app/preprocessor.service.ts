@@ -18,6 +18,17 @@ export class PreprocessorService {
     this.n_parts = bufferLen / partLen;
   }
 
+  static mean(arr: number[]): number{
+    let sum = arr.reduce((accumulator: number, currentValue: number): number => {return accumulator + currentValue});
+    return sum / arr.length;
+  }
+
+  static std(arr: number[], ddof: number): number{
+    let mean = PreprocessorService.mean(arr);
+    let squaredDifference = arr.reduce((accumulator: number, currentValue: number): number => {return accumulator + (currentValue - mean)  * (currentValue - mean)});
+    return  Math.sqrt(squaredDifference / (arr.length - ddof));
+  }
+
   static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
     // PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass(
     //   {
@@ -95,8 +106,8 @@ export class PreprocessorService {
     return e_parts;
   }
 
-  process() {
-    return PreprocessorService.integrate(
+  process(): number[] {
+    let energies = PreprocessorService.integrate(
       PreprocessorService.split(
         PreprocessorService.square(
           PreprocessorService.normalize(
@@ -106,6 +117,9 @@ export class PreprocessorService {
         this.n_parts
       )
     );
+    let std = PreprocessorService.std(energies, 1);
+    let mean = PreprocessorService.mean(energies);
+    return energies.map((currentValue: number): number => {return (currentValue - mean) / std});
   }
 
   tmp() {

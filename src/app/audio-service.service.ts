@@ -43,8 +43,8 @@ export class AudioService {
             const audioData = event.data.audioPCM;
             this.preprocessor.appendData(audioData);
             if (this.preprocessor.bufferIsReady()) {
-              // this.network.Predict(this.preprocessor.process());
-              this.preprocessor.tmp();
+              this.network.Predict(this.preprocessor.process());
+              // this.preprocessor.tmp();
             }
           }
         };

@@ -16,7 +16,7 @@ export class NeuralNetworkService {
   }
 
   public Predict(PCMdata: Array<number>): void {
-    let predicted = this.model.predict(tf.tensor(PCMdata).reshape([1, 20]));
+    let predicted = this.model.predict(tf.tensor(PCMdata).reshape([1, 1, 20]));
     if (Array.isArray(predicted)) {
       predicted = predicted[0];
     }
