@@ -18,7 +18,7 @@ export class PreprocessorService {
     this.n_parts = bufferLen / partLen;
   }
 
-  static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }) {
+  static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
     // PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass(
     //   {
     //     order: order,
@@ -33,23 +33,23 @@ export class PreprocessorService {
     );
   }
 
-  appendData(data: Float32Array) {
+  appendData(data: Float32Array): void {
     this.buffer.Append(data);
   }
 
-  clearBuffer() {
+  clearBuffer(): void {
     this.buffer.Clear();
   }
 
-  bufferIsReady() {
+  bufferIsReady(): Boolean {
     return this.buffer.IsReady();
   }
 
-  static formantFiltering(PCMdata: number[]) {
+  static formantFiltering(PCMdata: number[]): number[] {
     return this.firFilter.multiStep(PCMdata);
   }
 
-  static normalize(array: number[]) {
+  static normalize(array: number[]): number[] {
     let max = Math.max(...array);
     function callback(currentValue: number) {
       return currentValue / max;
@@ -57,13 +57,13 @@ export class PreprocessorService {
     return array.map(callback);
   }
 
-  static square(array: number[]) {
+  static square(array: number[]): number[] {
     return array.map(function (currentValue) {
       return currentValue * currentValue;
     });
   }
 
-  static split(array: number[], n_parts: number) {
+  static split(array: number[], n_parts: number): number[][] {
     let splited_arrays = new Array(n_parts);
     var part_len = ~~(array.length / n_parts);
     var add_length = array.length % n_parts;
@@ -82,7 +82,7 @@ export class PreprocessorService {
     return splited_arrays;
   }
 
-  static integrate(arrays: number[][]) {
+  static integrate(arrays: number[][]): number[] {
     let e_parts: number[] = Array(arrays.length);
     for (let i = 0; i < arrays.length; i++) {
       const part = arrays[i];
