@@ -18,7 +18,7 @@ export class AudioService {
   public Init(): BehaviorSubject<Boolean> {
     this.recording = new BehaviorSubject<Boolean>(false);
     this.audioCtx = new AudioContext();
-    PreprocessorService.initFirFilter({Fs: this.audioCtx.sampleRate});
+    PreprocessorService.initFirFilter({ Fs: this.audioCtx.sampleRate });
     this.preprocessor = new PreprocessorService(0.4, 0.02, this.audioCtx);
     this.network = new NeuralNetworkService();
     this._CreateRecorderWorklet(0.2);
@@ -43,7 +43,8 @@ export class AudioService {
             const audioData = event.data.audioPCM;
             this.preprocessor.appendData(audioData);
             if (this.preprocessor.bufferIsReady()) {
-              this.network.Predict(this.preprocessor.process());
+              // this.network.Predict(this.preprocessor.process());
+              this.preprocessor.tmp();
             }
           }
         };

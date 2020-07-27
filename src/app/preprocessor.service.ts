@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as Fili from 'fili';
 import { BufferPCMService } from './buffer-pcm.service';
+import { coeffs } from './shared/coeffs';
 
 export class PreprocessorService {
   buffer: BufferPCMService;
@@ -17,14 +18,19 @@ export class PreprocessorService {
     this.n_parts = bufferLen / partLen;
   }
 
-  static initFirFilter({order = 999, Fs, F1 = 260, F2 = 700}){
-    PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass({
-      order: order,
-      Fs: Fs,
-      F1: F1,
-      F2: F2,
-    });
-    PreprocessorService.firFilter = new Fili.FirFilter(PreprocessorService.firFilltersCoeffs);
+  static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }) {
+    // PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass(
+    //   {
+    //     order: order,
+    //     Fs: Fs,
+    //     F1: F1,
+    //     F2: F2,
+    //   }
+    // );
+    PreprocessorService.firFilltersCoeffs = coeffs.coeffs;
+    PreprocessorService.firFilter = new Fili.FirFilter(
+      PreprocessorService.firFilltersCoeffs
+    );
   }
 
   appendData(data: Float32Array) {
@@ -100,5 +106,12 @@ export class PreprocessorService {
         this.n_parts
       )
     );
+  }
+
+  tmp() {
+    console.log('Старт');
+    console.log(this.buffer.GetBuffer().join(', '));
+    console.log(this.process());
+    console.log('Конец');
   }
 }

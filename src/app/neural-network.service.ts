@@ -25,7 +25,7 @@ export class NeuralNetworkService {
       val = data[0] < data[1];
       this.prediction.next(val);
       console.log('ОПа, ключевое слово');
-      console.log(PCMdata);
+      // console.log(PCMdata);
     });
   }
 }
