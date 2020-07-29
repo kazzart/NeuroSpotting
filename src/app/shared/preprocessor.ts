@@ -1,16 +1,16 @@
 import * as Fili from 'fili';
-import { BufferPCMService } from './buffer-pcm.service';
-import { coeffs } from './shared/coeffs';
+import { BufferPCM } from './buffer-pcm';
+import { coeffs } from './coeffs';
 
-export class PreprocessorService {
-  buffer: BufferPCMService;
+export class Preprocessor {
+  buffer: BufferPCM;
   n_parts: number;
   static firCalculator = new Fili.FirCoeffs();
   static firFilltersCoeffs;
   static firFilter;
 
   constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
-    this.buffer = new BufferPCMService(
+    this.buffer = new BufferPCM(
       bufferLen * audioCtx.sampleRate,
       audioCtx
     );
@@ -23,13 +23,13 @@ export class PreprocessorService {
   }
 
   static std(arr: number[], ddof: number): number{
-    let mean = PreprocessorService.mean(arr);
+    let mean = Preprocessor.mean(arr);
     let squaredDifference = arr.reduce((accumulator: number, currentValue: number): number => {return accumulator + (currentValue - mean)  * (currentValue - mean)});
     return  Math.sqrt(squaredDifference / (arr.length - ddof));
   }
 
   static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
-    // PreprocessorService.firFilltersCoeffs = PreprocessorService.firCalculator.bandpass(
+    // Preprocessor.firFilltersCoeffs = Preprocessor.firCalculator.bandpass(
     //   {
     //     order: order,
     //     Fs: Fs,
@@ -37,9 +37,9 @@ export class PreprocessorService {
     //     F2: F2,
     //   }
     // );
-    PreprocessorService.firFilltersCoeffs = coeffs.coeffs;
-    PreprocessorService.firFilter = new Fili.FirFilter(
-      PreprocessorService.firFilltersCoeffs
+    Preprocessor.firFilltersCoeffs = coeffs.coeffs;
+    Preprocessor.firFilter = new Fili.FirFilter(
+      Preprocessor.firFilltersCoeffs
     );
   }
 
@@ -96,17 +96,17 @@ export class PreprocessorService {
 
   process(): number[] {
     console.time("filtering");
-    let filtered = PreprocessorService.formantFiltering(this.buffer.GetBuffer());
+    let filtered = Preprocessor.formantFiltering(this.buffer.GetBuffer());
     console.timeEnd("filtering");
-    let energies = PreprocessorService.integrate(
-      PreprocessorService.split(
-        PreprocessorService.squareNormalize( filtered
+    let energies = Preprocessor.integrate(
+      Preprocessor.split(
+        Preprocessor.squareNormalize( filtered
         ),
         this.n_parts
       )
     );
-    let std = PreprocessorService.std(energies, 1);
-    let mean = PreprocessorService.mean(energies);
+    let std = Preprocessor.std(energies, 1);
+    let mean = Preprocessor.mean(energies);
     return energies.map((currentValue: number): number => {return (currentValue - mean) / std});
   }
 }

@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import { BehaviorSubject } from 'rxjs';
 
-export class NeuralNetworkService {
+export class NeuralNetwork {
   private model: tf.LayersModel;
   public prediction: BehaviorSubject<Boolean>;
   constructor() {

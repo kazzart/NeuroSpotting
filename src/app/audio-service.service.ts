@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { PreprocessorService } from './preprocessor.service';
-import { NeuralNetworkService } from './neural-network.service';
+import {Preprocessor} from './shared/preprocessor';
+import {NeuralNetwork} from './shared/neural-network';
+
 
 @Injectable({
   providedIn: 'root',
@@ -9,18 +10,18 @@ import { NeuralNetworkService } from './neural-network.service';
 export class AudioService {
   private audioCtx: AudioContext;
   private microphone: MediaStreamAudioSourceNode;
-  private preprocessor: PreprocessorService;
+  private preprocessor: Preprocessor;
   private recorder: AudioWorkletNode;
-  private network: NeuralNetworkService;
+  private network: NeuralNetwork;
   private recording: BehaviorSubject<Boolean>;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
     this.recording = new BehaviorSubject<Boolean>(false);
     this.audioCtx = new AudioContext();
-    PreprocessorService.initFirFilter({ Fs: this.audioCtx.sampleRate });
-    this.preprocessor = new PreprocessorService(0.4, 0.02, this.audioCtx);
-    this.network = new NeuralNetworkService();
+    Preprocessor.initFirFilter({ Fs: this.audioCtx.sampleRate });
+    this.preprocessor = new Preprocessor(0.4, 0.02, this.audioCtx);
+    this.network = new NeuralNetwork();
     this._CreateRecorderWorklet(0.1);
     return this.network.prediction;
   }
