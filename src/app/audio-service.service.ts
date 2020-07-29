@@ -21,7 +21,7 @@ export class AudioService {
     PreprocessorService.initFirFilter({ Fs: this.audioCtx.sampleRate });
     this.preprocessor = new PreprocessorService(0.4, 0.02, this.audioCtx);
     this.network = new NeuralNetworkService();
-    this._CreateRecorderWorklet(0.2);
+    this._CreateRecorderWorklet(0.1);
     return this.network.prediction;
   }
 
@@ -43,8 +43,8 @@ export class AudioService {
             const audioData = event.data.audioPCM;
             this.preprocessor.appendData(audioData);
             if (this.preprocessor.bufferIsReady()) {
-              this.network.Predict(this.preprocessor.process());
-              // this.preprocessor.tmp();
+              let data = this.preprocessor.process();
+              this.network.Predict(data);
             }
           }
         };
@@ -70,9 +70,9 @@ export class AudioService {
 
   public Stop(): void {
     if (this.recording.value) {
-      this.recording.next(false);
       this.microphone.disconnect(this.recorder);
       this.recorder.disconnect(this.audioCtx.destination);
+      this.recording.next(false);
       this.preprocessor.clearBuffer();
       this.audioCtx.suspend();
     }

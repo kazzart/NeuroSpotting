@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import * as Fili from 'fili';
 import { BufferPCMService } from './buffer-pcm.service';
 import { coeffs } from './shared/coeffs';
@@ -60,18 +59,10 @@ export class PreprocessorService {
     return this.firFilter.multiStep(PCMdata);
   }
 
-  static normalize(array: number[]): number[] {
+  static squareNormalize(array: number[]): number[]{
     let max = Math.max(...array);
-    function callback(currentValue: number) {
-      return currentValue / max;
-    }
-    return array.map(callback);
-  }
-
-  static square(array: number[]): number[] {
-    return array.map(function (currentValue) {
-      return currentValue * currentValue;
-    });
+    max = max * max;
+    return array.map((currentValue: number): number => {return currentValue * currentValue / max});
   }
 
   static split(array: number[], n_parts: number): number[][] {
@@ -97,22 +88,19 @@ export class PreprocessorService {
     let e_parts: number[] = Array(arrays.length);
     for (let i = 0; i < arrays.length; i++) {
       const part = arrays[i];
-      e_parts[i] = 0;
-      for (let j = 0; j < part.length; j++) {
-        e_parts[i] += part[j];
-      }
+      e_parts[i] = part.reduce((accumulator: number, currentValue: number): number => {return accumulator + currentValue;});
       e_parts[i] -= (part[0] + part[part.length - 1]) / 2;
     }
     return e_parts;
   }
 
   process(): number[] {
+    console.time("filtering");
+    let filtered = PreprocessorService.formantFiltering(this.buffer.GetBuffer());
+    console.timeEnd("filtering");
     let energies = PreprocessorService.integrate(
       PreprocessorService.split(
-        PreprocessorService.square(
-          PreprocessorService.normalize(
-            PreprocessorService.formantFiltering(this.buffer.GetBuffer())
-          )
+        PreprocessorService.squareNormalize( filtered
         ),
         this.n_parts
       )
@@ -120,12 +108,5 @@ export class PreprocessorService {
     let std = PreprocessorService.std(energies, 1);
     let mean = PreprocessorService.mean(energies);
     return energies.map((currentValue: number): number => {return (currentValue - mean) / std});
-  }
-
-  tmp() {
-    console.log('Старт');
-    console.log(this.buffer.GetBuffer().join(', '));
-    console.log(this.process());
-    console.log('Конец');
   }
 }

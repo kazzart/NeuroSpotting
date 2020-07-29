@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import * as tf from '@tensorflow/tfjs';
 import { BehaviorSubject } from 'rxjs';
 
@@ -23,9 +22,8 @@ export class NeuralNetworkService {
     let val: Boolean;
     predicted.data().then((data) => {
       val = data[0] < data[1];
-      this.prediction.next(val);
-      console.log('ОПа, ключевое слово');
-      // console.log(PCMdata);
+      // this.prediction.next(val);
+      // console.log('Опа, ключевое слово');
     });
   }
 }

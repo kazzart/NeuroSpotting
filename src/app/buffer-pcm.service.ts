@@ -1,5 +1,3 @@
-import { Injectable } from '@angular/core';
-
 export class BufferPCMService {
   private audioCtx: AudioContext;
   private bufferMaxLen: number;
