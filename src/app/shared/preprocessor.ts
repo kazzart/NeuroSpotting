@@ -1,6 +1,7 @@
 import * as Fili from 'fili';
 import { BufferPCM } from './buffer-pcm';
 import { coeffs } from './coeffs';
+import { FirFilter } from './firFilter';
 
 export class Preprocessor {
   buffer: BufferPCM;
@@ -8,6 +9,7 @@ export class Preprocessor {
   static firCalculator = new Fili.FirCoeffs();
   static firFilltersCoeffs;
   static firFilter;
+  static filter: FirFilter;
 
   constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
     this.buffer = new BufferPCM(
@@ -38,9 +40,10 @@ export class Preprocessor {
     //   }
     // );
     Preprocessor.firFilltersCoeffs = coeffs.coeffs;
-    Preprocessor.firFilter = new Fili.FirFilter(
-      Preprocessor.firFilltersCoeffs
-    );
+    // Preprocessor.firFilter = new Fili.FirFilter(
+    //   Preprocessor.firFilltersCoeffs
+    // );
+    this.filter = new FirFilter(Preprocessor.firFilltersCoeffs);
   }
 
   appendData(data: Float32Array): void {
@@ -56,7 +59,8 @@ export class Preprocessor {
   }
 
   static formantFiltering(PCMdata: number[]): number[] {
-    return this.firFilter.multiStep(PCMdata);
+    // return this.firFilter.multiStep(PCMdata);
+    return this.filter.Filter(PCMdata);
   }
 
   static squareNormalize(array: number[]): number[]{
