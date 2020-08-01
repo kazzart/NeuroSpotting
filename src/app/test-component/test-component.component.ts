@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import { AudioService } from '../audio-service.service';
 @Component({
   selector: 'app-test-component',
@@ -8,18 +8,22 @@ import { AudioService } from '../audio-service.service';
 export class TestComponentComponent implements OnInit {
   prediction: Boolean;
   recording: Boolean;
-  constructor(private audio: AudioService) {}
+  constructor(private audio: AudioService,private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.prediction = false;
     this.audio.Init().subscribe((val: Boolean) => {
-      this.prediction = val;
-      if (this.prediction) {
-        this.audio.Stop();
+      if ( this.prediction != val ) {
+        this.prediction = val;
+        if (this.prediction) {
+          this.audio.Stop();
+        }
+        this.changeDetectorRef.detectChanges();
       }
     });
     this.audio.GetRecordingState().subscribe((state: Boolean) => {
       this.recording = state;
+      this.changeDetectorRef.detectChanges();
     });
   }
 

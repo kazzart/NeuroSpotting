@@ -25,7 +25,7 @@ export class NeuralNetwork {
       if (val) {
         console.log('Опа, ключевое слово');
       }
-      // this.prediction.next(val);
+      this.prediction.next(val);
     });
   }
 }

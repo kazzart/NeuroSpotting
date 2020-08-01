@@ -58,8 +58,8 @@ export class AudioService {
         this.microphone = this.audioCtx.createMediaStreamSource(stream);
         this.microphone.connect(this.recorder);
         this.recorder.connect(this.audioCtx.destination);
+        this.recording.next(true);
       }.bind(this);
-      this.recording.next(true);
       navigator.getUserMedia(
         { video: false, audio: true },
         callback,
