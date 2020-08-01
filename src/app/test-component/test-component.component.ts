@@ -8,7 +8,10 @@ import { AudioService } from '../audio-service.service';
 export class TestComponentComponent implements OnInit {
   prediction: Boolean;
   recording: Boolean;
-  constructor(private audio: AudioService,private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private audio: AudioService,private changeDetectorRef: ChangeDetectorRef) {
+    this.recording = false;
+    this.prediction = false;
+  }
 
   ngOnInit(): void {
     this.prediction = false;
@@ -34,5 +37,21 @@ export class TestComponentComponent implements OnInit {
 
   Stop(): void {
     this.audio.Stop();
+  }
+
+  Toggle(): void {
+    if ( this.recording ) {
+      this.Stop();
+    } else {
+      this.Start();
+    }
+  }
+
+  ButtonAppearence(){
+    let classes = {
+      recording: this.recording === true,
+      notRecording: this.recording === false
+    }
+    return classes
   }
 }

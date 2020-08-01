@@ -1,5 +1,17 @@
-<p>test-component works!</p>
-<p>Is it recording? {{ recording }}</p>
-<p>Is it key phrase? {{ prediction }}</p>
-<button (click)="Start()">Start</button>
-<button (click)="Stop()">Stop</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <p>Is it recording? {{ recording }}</p>
+            <p>Is it key phrase? {{ prediction }}</p>
+            <button [ngClass]="ButtonAppearence()" (click)="Toggle()">{{recording === false ? 'Start' : 'Stop'}}</button>
+        </div>
+    </div>
+</body>
+</html>
