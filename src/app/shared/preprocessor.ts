@@ -1,4 +1,3 @@
-import * as Fili from 'fili';
 import { BufferPCM } from './buffer-pcm';
 import { coeffs } from './coeffs';
 import { FirFilter } from './firFilter';
@@ -6,44 +5,36 @@ import { FirFilter } from './firFilter';
 export class Preprocessor {
   buffer: BufferPCM;
   n_parts: number;
-  static firCalculator = new Fili.FirCoeffs();
-  static firFilltersCoeffs;
-  static firFilter;
-  static filter: FirFilter;
+  static firFilltersCoeffs: number[];
+  static firFilter: FirFilter;
 
   constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
-    this.buffer = new BufferPCM(
-      bufferLen * audioCtx.sampleRate,
-      audioCtx
-    );
+    this.buffer = new BufferPCM(bufferLen * audioCtx.sampleRate, audioCtx);
     this.n_parts = bufferLen / partLen;
   }
 
-  static mean(arr: number[]): number{
-    let sum = arr.reduce((accumulator: number, currentValue: number): number => {return accumulator + currentValue});
+  static mean(arr: number[]): number {
+    let sum = arr.reduce(
+      (accumulator: number, currentValue: number): number => {
+        return accumulator + currentValue;
+      }
+    );
     return sum / arr.length;
   }
 
-  static std(arr: number[], ddof: number): number{
+  static std(arr: number[], ddof: number): number {
     let mean = Preprocessor.mean(arr);
-    let squaredDifference = arr.reduce((accumulator: number, currentValue: number): number => {return accumulator + (currentValue - mean)  * (currentValue - mean)});
-    return  Math.sqrt(squaredDifference / (arr.length - ddof));
+    let squaredDifference = arr.reduce(
+      (accumulator: number, currentValue: number): number => {
+        return accumulator + (currentValue - mean) * (currentValue - mean);
+      }
+    );
+    return Math.sqrt(squaredDifference / (arr.length - ddof));
   }
 
   static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
-    // Preprocessor.firFilltersCoeffs = Preprocessor.firCalculator.bandpass(
-    //   {
-    //     order: order,
-    //     Fs: Fs,
-    //     F1: F1,
-    //     F2: F2,
-    //   }
-    // );
     Preprocessor.firFilltersCoeffs = coeffs.coeffs;
-    // Preprocessor.firFilter = new Fili.FirFilter(
-    //   Preprocessor.firFilltersCoeffs
-    // );
-    this.filter = new FirFilter(Preprocessor.firFilltersCoeffs);
+    this.firFilter = new FirFilter(Preprocessor.firFilltersCoeffs);
   }
 
   appendData(data: Float32Array): void {
@@ -59,14 +50,15 @@ export class Preprocessor {
   }
 
   static formantFiltering(PCMdata: number[]): number[] {
-    // return this.firFilter.multiStep(PCMdata);
-    return this.filter.Filter(PCMdata);
+    return this.firFilter.Filter(PCMdata);
   }
 
-  static squareNormalize(array: number[]): number[]{
+  static squareNormalize(array: number[]): number[] {
     let max = Math.max(...array);
     max = max * max;
-    return array.map((currentValue: number): number => {return currentValue * currentValue / max});
+    return array.map((currentValue: number): number => {
+      return (currentValue * currentValue) / max;
+    });
   }
 
   static split(array: number[], n_parts: number): number[][] {
@@ -92,25 +84,29 @@ export class Preprocessor {
     let e_parts: number[] = Array(arrays.length);
     for (let i = 0; i < arrays.length; i++) {
       const part = arrays[i];
-      e_parts[i] = part.reduce((accumulator: number, currentValue: number): number => {return accumulator + currentValue;});
+      e_parts[i] = part.reduce(
+        (accumulator: number, currentValue: number): number => {
+          return accumulator + currentValue;
+        }
+      );
       e_parts[i] -= (part[0] + part[part.length - 1]) / 2;
     }
     return e_parts;
   }
 
   process(): number[] {
-    console.time("filtering");
-    let filtered = Preprocessor.formantFiltering(this.buffer.GetBuffer());
-    console.timeEnd("filtering");
-    let energies = Preprocessor.integrate(
-      Preprocessor.split(
-        Preprocessor.squareNormalize( filtered
-        ),
-        this.n_parts
-      )
+    let filtered: number[] = Preprocessor.formantFiltering(
+      this.buffer.GetBuffer()
     );
-    let std = Preprocessor.std(energies, 1);
-    let mean = Preprocessor.mean(energies);
-    return energies.map((currentValue: number): number => {return (currentValue - mean) / std});
+    let splited: number[][] = Preprocessor.split(
+      Preprocessor.squareNormalize(filtered),
+      this.n_parts
+    );
+    let energies = Preprocessor.integrate(splited);
+    let std: number = Preprocessor.std(energies, 1);
+    let mean: number = Preprocessor.mean(energies);
+    return energies.map((currentValue: number): number => {
+      return (currentValue - mean) / std;
+    });
   }
 }

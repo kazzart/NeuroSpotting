@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import {Preprocessor} from './shared/preprocessor';
-import {NeuralNetwork} from './shared/neural-network';
-
+import { Preprocessor } from './shared/preprocessor';
+import { NeuralNetwork } from './shared/neural-network';
 
 @Injectable({
   providedIn: 'root',

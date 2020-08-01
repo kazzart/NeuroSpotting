@@ -22,8 +22,10 @@ export class NeuralNetwork {
     let val: Boolean;
     predicted.data().then((data) => {
       val = data[0] < data[1];
+      if (val) {
+        console.log('Опа, ключевое слово');
+      }
       // this.prediction.next(val);
-      // console.log('Опа, ключевое слово');
     });
   }
 }

@@ -1,44 +1,23 @@
-class FilterBuffer{
-    public buffer: Array<number>;
-    public pointer: number;
+export class FirFilter {
+  private coefficients: Array<number>;
+  constructor(coefficients: Array<number>) {
+    this.coefficients = coefficients;
+  }
 
-    public constructor(length: number){
-        this.buffer = new Array<number>(length).fill(0);
-        this.pointer = 0;
+  public Filter(array: Array<number>): Array<number> {
+    let filtered = new Array<number>(array.length);
+    for (let i = array.length - 1; i >= 0; i--) {
+      let filteredSample: number = 0;
+      for (
+        let j = 0;
+        j <
+        (i + 1 < this.coefficients.length ? i + 1 : this.coefficients.length);
+        j++
+      ) {
+        filteredSample += this.coefficients[j] * array[i - j];
+      }
+      filtered[i] = filteredSample;
     }
-
-    public UpdatePointer(): void{
-        this.pointer = (this.pointer + 1) % (this.buffer.length);
-    }
-    
+    return filtered;
+  }
 }
-
-
-export class FirFilter{
-    public coeffs: Array<number>;
-    public buffer: FilterBuffer;
-
-    public constructor(coefficients: Array<number>){
-        this.coeffs = coefficients;
-        this.buffer = new FilterBuffer(this.coeffs.length - 1);
-    }
-
-    private Step(currentValue: number): number{
-        let out = 0;
-        this.buffer.buffer[this.buffer.pointer] = currentValue;
-        for (let i = 0; i < this.buffer.buffer.length; i++) {
-            out += (this.coeffs[i] * this.buffer.buffer[(this.buffer.pointer + i) % (this.buffer.buffer.length)]);
-        }
-        this.buffer.UpdatePointer();
-        return out;
-    }
-
-    public Filter(array: Array<number>):Array<number>{
-        let filtered = new Array<number>(array.length);
-        for (let i = 0; i < array.length; i++) {
-            filtered[i] = this.Step(array[i]);
-        }
-        return filtered;
-    }
-}
-
