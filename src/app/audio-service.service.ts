@@ -20,7 +20,7 @@ export class AudioService {
     this.audioCtx = new AudioContext();
     Preprocessor.initFirFilter({ Fs: this.audioCtx.sampleRate });
     this.preprocessor = new Preprocessor(0.4, 0.02, this.audioCtx);
-    this.network = new NeuralNetwork();
+    this.network = new NeuralNetwork(0.9);
     this._CreateRecorderWorklet(0.1);
     return this.network.prediction;
   }

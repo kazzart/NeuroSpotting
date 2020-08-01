@@ -29,6 +29,7 @@ export class TestComponentComponent implements OnInit {
 
   Start(): void {
     this.audio.Record();
+    this.prediction = false;
   }
 
   Stop(): void {

@@ -3,8 +3,9 @@ import { BehaviorSubject } from 'rxjs';
 
 export class NeuralNetwork {
   private model: tf.LayersModel;
+  private treshold: number;
   public prediction: BehaviorSubject<Boolean>;
-  constructor() {
+  constructor(activationTreshold: number) {
     this.prediction = new BehaviorSubject<Boolean>(false);
     tf.loadLayersModel(
       'https://files.rtuitlab.ru/sergeev/model/Mira/model.json'
@@ -12,6 +13,7 @@ export class NeuralNetwork {
       this.model = loadedModel;
       console.log('loaded');
     });
+    this.treshold = activationTreshold;
   }
 
   public Predict(PCMdata: Array<number>): void {
@@ -21,7 +23,7 @@ export class NeuralNetwork {
     }
     let val: Boolean;
     predicted.data().then((data) => {
-      val = data[0] < data[1];
+      val = this.treshold < data[1];
       if (val) {
         console.log('Опа, ключевое слово');
       }
