@@ -8,9 +8,11 @@ import { AudioService } from '../audio-service.service';
 export class TestComponentComponent implements OnInit {
   prediction: Boolean;
   recording: Boolean;
+  keyPhraseCounter: number;
   constructor(private audio: AudioService,private changeDetectorRef: ChangeDetectorRef) {
     this.recording = false;
     this.prediction = false;
+    this.keyPhraseCounter = 0;
   }
 
   ngOnInit(): void {
@@ -19,7 +21,8 @@ export class TestComponentComponent implements OnInit {
       if ( this.prediction != val ) {
         this.prediction = val;
         if (this.prediction) {
-          this.audio.Stop();
+          // this.audio.Stop();
+          this.keyPhraseCounter++;
         }
         this.changeDetectorRef.detectChanges();
       }
