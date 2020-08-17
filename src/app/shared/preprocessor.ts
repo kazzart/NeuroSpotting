@@ -33,7 +33,7 @@ export class Preprocessor {
   }
 
   static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
-    Preprocessor.firFilltersCoeffs = coeffs.coeffs;
+    Preprocessor.firFilltersCoeffs = coeffs;
     this.firFilter = new FirFilter(Preprocessor.firFilltersCoeffs);
   }
 

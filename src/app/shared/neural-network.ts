@@ -8,10 +8,9 @@ export class NeuralNetwork {
   constructor(activationTreshold: number) {
     this.prediction = new BehaviorSubject<Boolean>(false);
     tf.loadLayersModel(
-      'https://files.rtuitlab.ru/sergeev/model/Mira/model.json'
+      'assets/models/model.json'
     ).then((loadedModel) => {
       this.model = loadedModel;
-      console.log('loaded');
     });
     this.treshold = activationTreshold;
   }
@@ -24,9 +23,6 @@ export class NeuralNetwork {
     let val: Boolean;
     predicted.data().then((data) => {
       val = this.treshold < data[1];
-      if (val) {
-        console.log('Опа, ключевое слово');
-      }
       this.prediction.next(val);
     });
   }
