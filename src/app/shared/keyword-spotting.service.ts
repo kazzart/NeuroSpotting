@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Preprocessor } from './shared/preprocessor';
-import { NeuralNetwork } from './shared/neural-network';
+import { Preprocessor } from '../classes/preprocessor';
+import { NeuralNetwork } from '../classes/neural-network';
 
 @Injectable({
   providedIn: 'root',
@@ -18,9 +18,9 @@ export class KeywordSpottingService {
   public Init(): BehaviorSubject<Boolean> {
     this.recording = new BehaviorSubject<Boolean>(false);
     this.audioCtx = new AudioContext();
-    Preprocessor.initFirFilter({ Fs: this.audioCtx.sampleRate });
+    Preprocessor.initFirFilter();
     this.preprocessor = new Preprocessor(0.4, 0.02, this.audioCtx);
-    this.network = new NeuralNetwork(0.9);
+    this.network = new NeuralNetwork(0.9, './assets/models/mira/model.json');
     this._CreateRecorderWorklet(0.1);
     return this.network.prediction;
   }
@@ -53,7 +53,7 @@ export class KeywordSpottingService {
 
   public Record(): void {
     if (!this.recording.value) {
-      let callback = function (stream) {
+      let StartRecording = function (stream) {
         this.audioCtx.resume();
         this.microphone = this.audioCtx.createMediaStreamSource(stream);
         this.microphone.connect(this.recorder);
@@ -62,7 +62,7 @@ export class KeywordSpottingService {
       }.bind(this);
       navigator.getUserMedia(
         { video: false, audio: true },
-        callback,
+        StartRecording,
         console.log
       );
     }

@@ -1,4 +1,4 @@
-export const coeffs: Array<number> = [
+export const coefficients: Array<number> = [
   0.00009875,
   0.00009925,
   0.00009928,

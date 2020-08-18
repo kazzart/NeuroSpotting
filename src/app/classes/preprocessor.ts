@@ -1,5 +1,5 @@
 import { BufferPCM } from './buffer-pcm';
-import { coeffs } from './coeffs';
+import { coefficients } from './filterCoefficients';
 import { FirFilter } from './firFilter';
 
 export class Preprocessor {
@@ -32,9 +32,8 @@ export class Preprocessor {
     return Math.sqrt(squaredDifference / (arr.length - ddof));
   }
 
-  static initFirFilter({ order = 999, Fs, F1 = 260, F2 = 700 }): void {
-    Preprocessor.firFilltersCoeffs = coeffs;
-    this.firFilter = new FirFilter(Preprocessor.firFilltersCoeffs);
+  static initFirFilter(): void {
+    this.firFilter = new FirFilter(coefficients);
   }
 
   appendData(data: Float32Array): void {

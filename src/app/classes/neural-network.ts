@@ -5,10 +5,10 @@ export class NeuralNetwork {
   private model: tf.LayersModel;
   private treshold: number;
   public prediction: BehaviorSubject<Boolean>;
-  constructor(activationTreshold: number) {
+  constructor(activationTreshold: number, networkPath: string) {
     this.prediction = new BehaviorSubject<Boolean>(false);
     tf.loadLayersModel(
-      'assets/models/model.json'
+      networkPath
     ).then((loadedModel) => {
       this.model = loadedModel;
     });

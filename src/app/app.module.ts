@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestComponentComponent } from './test-component/test-component.component';
-import { KeywordSpottingService } from './keyword-spotting.service';
+import { KeywordSpottingService } from './shared/keyword-spotting.service';
 
 @NgModule({
   declarations: [AppComponent, TestComponentComponent],

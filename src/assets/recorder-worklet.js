@@ -8,12 +8,6 @@ class RecorderWorklet extends AudioWorkletProcessor {
     this._realLen = 0;
   }
 
-  process(inputs, outputs) {
-    const input = inputs[0];
-    this._Append(input[0]);
-    return true;
-  }
-
   _Append(data) {
     let emptySize = this._buffer.length - this._realLen;
     if (data.length >= emptySize) {
@@ -40,6 +34,14 @@ class RecorderWorklet extends AudioWorkletProcessor {
       audioPCM: buffer,
     });
     this._realLen = 0;
+  }
+  
+  process(inputs, outputs) {
+    const input = inputs[0];
+    if (input[0] != null){
+      this._Append(input[0]);
+    }
+    return true;
   }
 }
 registerProcessor("recorder", RecorderWorklet);

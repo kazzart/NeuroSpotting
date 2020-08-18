@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
-import { KeywordSpottingService } from '../keyword-spotting.service';
+import { KeywordSpottingService } from '../shared/keyword-spotting.service';
 @Component({
   selector: 'app-test-component',
   templateUrl: './test-component.component.html',
