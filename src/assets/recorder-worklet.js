@@ -38,8 +38,15 @@ class RecorderWorklet extends AudioWorkletProcessor {
   
   process(inputs, outputs) {
     const input = inputs[0];
-    if (input[0] != null){
-      this._Append(input[0]);
+    if(input.length){
+      const mono = input[0].slice();
+      for (let i = 1; i < input.length; i++) {
+        const chanel = input[i];
+        for (let j = 0; j < chanel.length; j++) {
+          mono[j] += chanel[j];
+        }
+      }
+      this._Append(mono);
     }
     return true;
   }
