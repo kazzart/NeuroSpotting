@@ -6,7 +6,7 @@ import { NeuralNetwork } from './shared/neural-network';
 @Injectable({
   providedIn: 'root',
 })
-export class AudioService {
+export class KeywordSpottingService {
   private audioCtx: AudioContext;
   private microphone: MediaStreamAudioSourceNode;
   private preprocessor: Preprocessor;
@@ -31,7 +31,7 @@ export class AudioService {
 
   private _CreateRecorderWorklet(windowLen: number) {
     this.audioCtx.audioWorklet
-      .addModule('../assets/recorder-worklet.js')
+      .addModule('assets/recorder-worklet.js')
       .then(() => {
         this.recorder = new AudioWorkletNode(this.audioCtx, 'recorder', {
           processorOptions: {

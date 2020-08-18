@@ -9,7 +9,6 @@
     <div class="wrapper">
         <div class="container">
             <p>Is it recording? {{ recording }}</p>
-            <p>Is it key phrase? {{ prediction }}</p>
             <p>Times said key phrase: {{ keyPhraseCounter }}</p>
             <button [ngClass]="ButtonAppearence()" (click)="Toggle()">{{recording === false ? 'Start' : 'Stop'}}</button>
         </div>

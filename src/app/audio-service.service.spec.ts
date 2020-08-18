@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AudioService } from './audio-service.service';
+import { KeywordSpottingService } from './keyword-spotting.service';
 
 describe('AudioServiceService', () => {
-  let service: AudioService;
+  let service: KeywordSpottingService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AudioService);
+    service = TestBed.inject(KeywordSpottingService);
   });
 
   it('should be created', () => {

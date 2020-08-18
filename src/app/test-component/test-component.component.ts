@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
-import { AudioService } from '../audio-service.service';
+import { KeywordSpottingService } from '../keyword-spotting.service';
 @Component({
   selector: 'app-test-component',
   templateUrl: './test-component.component.html',
@@ -9,7 +9,7 @@ export class TestComponentComponent implements OnInit {
   prediction: Boolean;
   recording: Boolean;
   keyPhraseCounter: number;
-  constructor(private audio: AudioService,private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private audio: KeywordSpottingService,private changeDetectorRef: ChangeDetectorRef) {
     this.recording = false;
     this.prediction = false;
     this.keyPhraseCounter = 0;

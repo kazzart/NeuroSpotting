@@ -1,10 +1,8 @@
 export class BufferPCM {
-    private audioCtx: AudioContext;
     private bufferMaxLen: number;
     private buffer: Array<number>;
   
-    public constructor(bufferLength: number, audioContext: AudioContext) {
-      this.audioCtx = audioContext;
+    public constructor(bufferLength: number) {
       this.bufferMaxLen = bufferLength;
       this.buffer = new Array<number>(0);
     }

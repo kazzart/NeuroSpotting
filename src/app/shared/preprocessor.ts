@@ -9,7 +9,7 @@ export class Preprocessor {
   static firFilter: FirFilter;
 
   constructor(bufferLen: number, partLen: number, audioCtx: AudioContext) {
-    this.buffer = new BufferPCM(bufferLen * audioCtx.sampleRate, audioCtx);
+    this.buffer = new BufferPCM(bufferLen * audioCtx.sampleRate);
     this.n_parts = bufferLen / partLen;
   }
 
