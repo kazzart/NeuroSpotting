@@ -13,6 +13,7 @@ export class KeywordSpottingService {
   private recorder: AudioWorkletNode;
   private network: NeuralNetwork;
   private recording: BehaviorSubject<Boolean>;
+  private stream: MediaStream;
   constructor() {}
 
   public Init(): BehaviorSubject<Boolean> {
@@ -53,8 +54,9 @@ export class KeywordSpottingService {
 
   public Record(): void {
     if (!this.recording.value) {
-      let StartRecording = function (stream) {
+      let StartRecording = function (stream: MediaStream) {
         this.audioCtx.resume();
+        this.stream = stream;
         this.microphone = this.audioCtx.createMediaStreamSource(stream);
         this.microphone.connect(this.recorder);
         this.recorder.connect(this.audioCtx.destination);
@@ -72,6 +74,7 @@ export class KeywordSpottingService {
     if (this.recording.value) {
       this.microphone.disconnect(this.recorder);
       this.recorder.disconnect(this.audioCtx.destination);
+      this.stream.getTracks()[0].stop();
       this.recording.next(false);
       this.preprocessor.clearBuffer();
       this.audioCtx.suspend();
