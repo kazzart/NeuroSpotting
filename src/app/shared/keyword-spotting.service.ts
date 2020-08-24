@@ -75,6 +75,8 @@ export class KeywordSpottingService {
       this.microphone.disconnect(this.recorder);
       this.recorder.disconnect(this.audioCtx.destination);
       this.stream.getTracks()[0].stop();
+      this.microphone = null;
+      this.stream = null;
       this.recording.next(false);
       this.preprocessor.clearBuffer();
       this.audioCtx.suspend();
