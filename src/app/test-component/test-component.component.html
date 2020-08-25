@@ -10,6 +10,9 @@
         <div class="container">
             <p>Is it recording? {{ recording }}</p>
             <p>Times said key phrase: {{ keyPhraseCounter }}</p>
+            <select (change)="UpdateModelName()" [(ngModel)]="currentModelName" [disabled]="recording" class="select">
+                <option *ngFor="let model of modelNames" [ngValue]="model.name"> {{model.displayName}} </option>
+            </select>
             <button [ngClass]="ButtonAppearence()" (click)="Toggle()">{{recording === false ? 'Start' : 'Stop'}}</button>
         </div>
     </div>

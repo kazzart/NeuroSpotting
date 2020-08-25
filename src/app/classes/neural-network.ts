@@ -5,14 +5,23 @@ export class NeuralNetwork {
   private model: tf.LayersModel;
   private treshold: number;
   public prediction: BehaviorSubject<Boolean>;
-  constructor(activationTreshold: number, networkPath: string) {
+  private modelName: string = '';
+
+  constructor(activationTreshold: number, modelName: string) {
     this.prediction = new BehaviorSubject<Boolean>(false);
-    tf.loadLayersModel(
-      networkPath
-    ).then((loadedModel) => {
-      this.model = loadedModel;
-    });
+    this.LoadModel(modelName);
     this.treshold = activationTreshold;
+  }
+
+  public LoadModel(modelName: string) {
+    if (this.modelName != modelName) {
+      tf.loadLayersModel('./assets/models/' + modelName + '/model.json').then(
+        (loadedModel) => {
+          this.model = loadedModel;
+        }
+      );
+      this.modelName = modelName;
+    }
   }
 
   public Predict(PCMdata: Array<number>): void {

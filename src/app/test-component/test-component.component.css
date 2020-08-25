@@ -10,6 +10,7 @@
 
 .recording{
     font-size: 18px;
+    margin: 20px 0px;
     border: none;
     border-radius: 5px;
     outline: none;
@@ -22,6 +23,20 @@
 	animation-iteration-count: infinite;
 	animation-timing-function: linear;
 }
+
+.select{
+    width: 150px;
+    height: 30px;
+    font-size: 18px;
+    border-radius: 3px;
+    border-color: #222222;
+    background-color: #191919;
+    outline: none;
+    color: #909090;
+    padding: none;
+    margin: none;
+}
+
 
 @keyframes pulse{
 	0%{
@@ -37,6 +52,7 @@
 
 .notRecording{
     font-size: 18px;
+    margin: 20px 0px;
     border: none;
     border-radius: 5px;
     outline: none;

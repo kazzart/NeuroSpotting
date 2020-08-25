@@ -16,12 +16,12 @@ export class KeywordSpottingService {
   private stream: MediaStream;
   constructor() {}
 
-  public Init(): BehaviorSubject<Boolean> {
+  public Init(modelName: string): BehaviorSubject<Boolean> {
     this.recording = new BehaviorSubject<Boolean>(false);
     this.audioCtx = new AudioContext();
     Preprocessor.initFirFilter();
     this.preprocessor = new Preprocessor(0.4, 0.02, this.audioCtx);
-    this.network = new NeuralNetwork(0.9, './assets/models/mira/model.json');
+    this.network = new NeuralNetwork(0.9, modelName);
     this._CreateRecorderWorklet(0.1);
     return this.network.prediction;
   }
@@ -81,5 +81,9 @@ export class KeywordSpottingService {
       this.preprocessor.clearBuffer();
       this.audioCtx.suspend();
     }
+  }
+
+  public LoadModel(modelName: string): void {
+    this.network.LoadModel(modelName);
   }
 }
